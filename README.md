@@ -1,8 +1,10 @@
 # YCompiler
-A light-weight interpreter/interpreter for C-like scripting language, base on Java. 
-Unit testing involved.
+A light-weight interpreter for a C-like scripting language, implemented in
+Java.
 
-The code will be compiled to customized MIPS like assembly, and run under a
+For compiling part:
+
+The code will be compiled to customized assembly, and run under a
 virtual machine.
 
 ## To compile the program
@@ -15,5 +17,5 @@ virtual machine.
 ## To run the program
 ````
 $ cd bin
-$ java Main <input file>
+$ java SkirtL <input file>
 ````

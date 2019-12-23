@@ -1,4 +1,4 @@
-# Expected Features for Interpreter
+# Expected Features for SInterpreter
 
 ## Stage 1
 - [ ] Supports variable declaration, integer operation without arithmetic precedence.
