@@ -1,4 +1,4 @@
-# YCompiler
+# SkirtL
 A light-weight interpreter for a C-like scripting language, implemented in
 Java.
 
