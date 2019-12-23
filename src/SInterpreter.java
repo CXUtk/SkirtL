@@ -8,13 +8,13 @@ public class SInterpreter {
 
     }
 
-    public void run(String str){
+    public void run(String str, String filename){
     	try {
 		    Scanner scanner = new Scanner(str);
 		    TokenList tokens = scanner.scanTokens();
 		    System.out.println(tokens.toString());
 	    } catch (LexicalException e){
-    		System.out.println(String.format("[Lexical Error] %s (line: %d)", e.getMessage(), e.getLine()));
+    		System.out.println(String.format("[Lexical Error] %s (%s: line: %d)", e.getMessage(), filename, e.getLine()));
 	    }
     }
 }

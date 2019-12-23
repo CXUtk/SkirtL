@@ -31,7 +31,7 @@ public class SkirtL {
 
         while (true){
             System.out.print("> ");
-            run(reader.readLine());
+            run(reader.readLine(), "[Prompt]");
         }
     }
 
@@ -42,11 +42,11 @@ public class SkirtL {
      */
     private static void runScript(String filename) throws IOException {
         byte[] bytes = Files.readAllBytes(Paths.get(filename));
-        run(new String(bytes, Charset.defaultCharset()));
+        run(new String(bytes, Charset.defaultCharset()), filename);
     }
 
-    private static void run(String src){
+    private static void run(String src, String name){
         SInterpreter interpreter = new SInterpreter();
-        interpreter.run(src);
+        interpreter.run(src, name);
     }
 }
