@@ -13,7 +13,7 @@ public class SkirtL {
     public static void main(String[] args) throws IOException {
         if (args.length > 1) {
             System.err.println("Usage: SkirtL [filename]");
-            System.exit(64);
+            System.exit(-1);
         } else if (args.length == 1) {
             runScript(args[0]);
         } else {
@@ -29,7 +29,7 @@ public class SkirtL {
         InputStreamReader input = new InputStreamReader(System.in);
         BufferedReader reader = new BufferedReader(input);
 
-        while (true) { ​
+        while (true){
             System.out.print("> ");
             run(reader.readLine());
         }

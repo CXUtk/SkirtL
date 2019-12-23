@@ -8,9 +8,8 @@ import java.util.ArrayList;
 
 public class FileUtils {
     public static ArrayList<String> readAllLines(String filename) throws IOException {
-        ArrayList<String> lines = new ArrayList<>();
+        ArrayList<String> lines;
         try (BufferedReader br = new BufferedReader(new FileReader(filename))) {
-            // Do some pre-check if necessary
             lines = new ArrayList<>();
             String line;
             while ((line = br.readLine()) != null) {
