@@ -35,7 +35,24 @@ public enum TokenType {
     EQUAL_TO,
     NOT_EQUAL_TO,
     NOT,
+    AND,
+    OR,
+    IF,
+    ELSE,
+    FOR,
+    WHILE,
+    RETURN,
+    FUNCTION,
+    THIS,
+    SUPER,
+
+
+    FALSE,
+    TRUE,
+    VAR,
+
+    CLASS,
 
     EOF,
-    UNKNOWN
+    UNKNOWN,
 }

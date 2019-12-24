@@ -3,6 +3,8 @@ package Lexical;
 import ErrorHandling.LexicalException;
 
 import java.util.ArrayList;
+import java.util.Hashtable;
+
 
 public class Scanner {
     private int start;
@@ -10,7 +12,30 @@ public class Scanner {
     private int currentLine;
     private String source;
     private ArrayList<Token> tokenList;
-	public Scanner(String src){
+
+    private static final Hashtable<String, TokenType> keywords;
+    static {
+        keywords = new Hashtable<>();
+        keywords.put("and", TokenType.AND);
+        keywords.put("or", TokenType.OR);
+        keywords.put("class", TokenType.CLASS);
+        keywords.put("if", TokenType.IF);
+        keywords.put("else", TokenType.ELSE);
+        keywords.put("false", TokenType.FALSE);
+        keywords.put("for", TokenType.FOR);
+        keywords.put("function", TokenType.FUNCTION);
+        keywords.put("null", TokenType.NULL);
+        // keywords.put("print", );
+        keywords.put("return", TokenType.RETURN);
+        keywords.put("super", TokenType.SUPER);
+        keywords.put("this", TokenType.THIS);
+        keywords.put("true", TokenType.TRUE);
+        keywords.put("var", TokenType.VAR);
+        keywords.put("while", TokenType.WHILE);
+    }
+
+
+    public Scanner(String src){
         start = current = 0;
         currentLine = 1;
         source = src;
@@ -90,8 +115,46 @@ public class Scanner {
                 break;
             }
             default: {
-                throw new LexicalException(currentLine, 0, String.format("Unexpected Token: '%c'", c));
+                if(isAlphaNumeric(c)){
+                    scanNumber();
+                }
+                else if (isDigit(c)) {
+                    scanIdentifier();
+                }
+                else {
+                    throw new LexicalException(currentLine, 0, String.format("Unexpected Token: '%c'", c));
+                }
             }
+        }
+    }
+
+    private void scanIdentifier() {
+	    while(isAlphaNumeric(getCurrent())) advance();
+        String text = source.substring(start, current);
+        if(keywords.contains(text)){
+            addToken(keywords.get(text));
+        }
+        else{
+            addToken(TokenType.IDENTIFIER);
+        }
+    }
+
+    private void scanNumber() throws LexicalException {
+	    while(isDigit(getCurrent())) advance();
+	    boolean fraction = false;
+	    if(getCurrent() == '.' && isDigit(getNext())){
+	        advance();
+            fraction = true;
+	        while(isDigit(getCurrent())) advance();
+        }
+	    try {
+            if (fraction) {
+                addToken(TokenType.DIGIT, Double.parseDouble(source.substring(start, current)));
+            } else {
+                addToken(TokenType.DIGIT, Integer.parseInt(source.substring(start, current)));
+            }
+        } catch (NumberFormatException e){
+	        throw new LexicalException(currentLine, 0, "Number is invalid");
         }
     }
 
@@ -123,7 +186,18 @@ public class Scanner {
         return true;
     }
 
+    private char getNext() {
+        if (current + 1 >= source.length()) return '\0';
+        return source.charAt(current + 1);
+    }
+
+    private char getCurrent() {
+        if (current >= source.length()) return '\0';
+        return source.charAt(current);
+    }
+
     private char advance(){
+        if (current >= source.length()) return '\0';
 	    ++current;
 	    return source.charAt(current - 1);
     }
@@ -139,5 +213,19 @@ public class Scanner {
 
     private boolean isEOF(){
 	    return current >= source.length();
+    }
+
+    private boolean isDigit(char c) {
+        return c >= '0' && c <= '9';
+    }
+
+    private boolean isAlpha(char c) {
+        return (c >= 'a' && c <= 'z') ||
+                (c >= 'A' && c <= 'Z') ||
+                c == '_';
+    }
+
+    private boolean isAlphaNumeric(char c) {
+        return isAlpha(c) || isDigit(c);
     }
 }
