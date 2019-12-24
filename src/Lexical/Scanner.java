@@ -6,6 +6,10 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 
 
+/**
+ * Scan character stream and extract tokens from it
+ * Output a TokenList
+ */
 public class Scanner {
     private int start;
     private int current;
