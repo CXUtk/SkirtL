@@ -6,7 +6,7 @@ package Lexical;
 public enum TokenType {
     DIGIT,
     IDENTIFIER,
-    KEYWORD,
+    PRINT,
     STRING,
     NULL,
 

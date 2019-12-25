@@ -2,6 +2,9 @@ package Lexical;
 
 import ErrorHandling.LexicalException;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Hashtable;
 
@@ -29,7 +32,7 @@ public class Scanner {
         keywords.put("for", TokenType.FOR);
         keywords.put("function", TokenType.FUNCTION);
         keywords.put("null", TokenType.NULL);
-        // keywords.put("print", );
+        keywords.put("print", TokenType.PRINT);
         keywords.put("return", TokenType.RETURN);
         keywords.put("super", TokenType.SUPER);
         keywords.put("this", TokenType.THIS);
@@ -120,10 +123,10 @@ public class Scanner {
             }
             default: {
                 if(isAlphaNumeric(c)){
-                    scanNumber();
+                    scanIdentifier();
                 }
                 else if (isDigit(c)) {
-                    scanIdentifier();
+                    scanNumber();
                 }
                 else {
                     throw new LexicalException(currentLine, 0, String.format("Unexpected Token: '%c'", c));
@@ -135,12 +138,7 @@ public class Scanner {
     private void scanIdentifier() {
 	    while(isAlphaNumeric(getCurrent())) advance();
         String text = source.substring(start, current);
-        if(keywords.contains(text)){
-            addToken(keywords.get(text));
-        }
-        else{
-            addToken(TokenType.IDENTIFIER);
-        }
+        addToken(keywords.getOrDefault(text, TokenType.IDENTIFIER));
     }
 
     private void scanNumber() throws LexicalException {
@@ -183,6 +181,12 @@ public class Scanner {
         }
     }
 
+    /**
+     * Match current character with target character, if success return true and
+     * advance pointer by one
+     * @param c
+     * @return
+     */
     private boolean match(char c) {
         if (isEOF()) return false;
         if (source.charAt(current) != c) return false;
@@ -200,6 +204,10 @@ public class Scanner {
         return source.charAt(current);
     }
 
+    /**
+     * Advance our pointer once, and return the character before the advance
+     * @return
+     */
     private char advance(){
         if (current >= source.length()) return '\0';
 	    ++current;
@@ -231,5 +239,22 @@ public class Scanner {
 
     private boolean isAlphaNumeric(char c) {
         return isAlpha(c) || isDigit(c);
+    }
+
+
+    public static void main(String[] args) throws IOException {
+        InputStreamReader input = new InputStreamReader(System.in);
+        BufferedReader reader = new BufferedReader(input);
+
+        while (true) {
+            System.out.print("> ");
+            Scanner scanner = new Scanner(reader.readLine());
+            try {
+                TokenList tokens = scanner.scanTokens();
+                System.out.println(tokens.toString());
+            } catch (LexicalException e) {
+                System.err.println(String.format("[Lexical Error] %s (%s: line: %d)", e.getMessage(), "[Test]", e.getLine()));
+            }
+        }
     }
 }

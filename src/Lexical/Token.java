@@ -22,6 +22,7 @@ public class Token {
         this.text = text;
         this.type = type;
         this.lineNumber = lineNumber;
+        this.value = val;
     }
 
     @Override
