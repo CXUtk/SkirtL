@@ -48,14 +48,14 @@ public class Scanner {
         source = src;
 	}
 
-	public TokenList scanTokens() throws LexicalException {
+	public ArrayList<Token> scanTokens() throws LexicalException {
         tokenList = new ArrayList<>();
 		while(!isEOF()){
 		    start = current;
 		    scanNext();
         }
 		tokenList.add(new Token("", TokenType.EOF, null, currentLine));
-		return new TokenList(tokenList);
+		return tokenList;
 	}
 
     private void scanNext() throws LexicalException {
@@ -122,11 +122,11 @@ public class Scanner {
                 break;
             }
             default: {
-                if(isAlphaNumeric(c)){
-                    scanIdentifier();
-                }
-                else if (isDigit(c)) {
+                if (isDigit(c)) {
                     scanNumber();
+                }
+                else if(isAlphaNumeric(c)){
+                    scanIdentifier();
                 }
                 else {
                     throw new LexicalException(currentLine, 0, String.format("Unexpected Token: '%c'", c));
@@ -250,7 +250,7 @@ public class Scanner {
             System.out.print("> ");
             Scanner scanner = new Scanner(reader.readLine());
             try {
-                TokenList tokens = scanner.scanTokens();
+                ArrayList tokens = scanner.scanTokens();
                 System.out.println(tokens.toString());
             } catch (LexicalException e) {
                 System.err.println(String.format("[Lexical Error] %s (%s: line: %d)", e.getMessage(), "[Test]", e.getLine()));

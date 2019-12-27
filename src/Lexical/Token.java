@@ -12,6 +12,11 @@ public class Token {
     public TokenType getType() {
         return type;
     }
+
+    public Object getValue() {
+        return value;
+    }
+
     public String getText() {
         return text;
     }
