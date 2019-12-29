@@ -4,6 +4,7 @@ import ErrorHandling.ParsingException;
 import Lexical.Token;
 import Lexical.TokenList;
 import Lexical.TokenType;
+import Main.SInterpreter;
 import Parsing.AST.Expr;
 
 import javax.swing.text.html.parser.AttributeList;
@@ -128,17 +129,23 @@ public class Parser {
         if(match(TokenType.DIGIT)) return new Expr.Literal(getPrev().getValue());
         if(match(TokenType.LEFT_PARENTHESES)){
             Expr expr = expression();
-            expect(TokenType.RIGHT_PARENTHESES);
+            expect(TokenType.RIGHT_PARENTHESES, "expect ')' for expression");
             return new Expr.Grouping(expr);
         }
-        throw new ParsingException(getCurrent().getLineNumber(), 0, "Invalid expression");
+        throw error(getCurrent(), "Invalid expression");
     }
 
-    private void expect(TokenType type) throws ParsingException {
+    private void expect(TokenType type, String text) throws ParsingException {
         if(getCurrent().getType() != type){
-            throw new ParsingException(getCurrent().getLineNumber(), 0, "Expected ')'");
+            throw error(getCurrent(), text);
         }
         advance();
+    }
+
+
+    private ParsingException error(Token token, String text){
+        SInterpreter.error(token.getLineNumber(), 0, token.getText(), text);
+        return new ParsingException(text);
     }
 
     private boolean match(TokenType... types) {

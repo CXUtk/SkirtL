@@ -4,12 +4,10 @@ package ErrorHandling;
 /**
  This class is used for format exception output string
  */
-public class ParsingException extends Exception {
+public class ParsingException extends RuntimeException {
     private int line, col;
-    public ParsingException(int line, int col, String errormessage) {
+    public ParsingException(String errormessage) {
         super(errormessage);
-        this.line = line;
-        this.col = col;
     }
     public int getCol() {
         return col;

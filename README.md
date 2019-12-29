@@ -1,4 +1,4 @@
-# SkirtL
+# Main.SkirtL
 A light-weight interpreter for a C-like scripting language, implemented in
 Java.
 
@@ -17,5 +17,5 @@ virtual machine.
 ## To run the program
 ````
 $ cd bin
-$ java SkirtL <input file>
+$ java Main.SkirtL <input file>
 ````

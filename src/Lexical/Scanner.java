@@ -1,6 +1,8 @@
 package Lexical;
 
 import ErrorHandling.LexicalException;
+import Main.SInterpreter;
+import Main.SkirtL;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -17,6 +19,7 @@ public class Scanner {
     private int start;
     private int current;
     private int currentLine;
+    private int lineStart;
     private String source;
     private ArrayList<Token> tokenList;
 
@@ -54,7 +57,7 @@ public class Scanner {
 		    start = current;
 		    scanNext();
         }
-		tokenList.add(new Token("", TokenType.EOF, null, currentLine));
+		tokenList.add(new Token("end of file", TokenType.EOF, null, currentLine, current - lineStart));
 		return tokenList;
 	}
 
@@ -67,7 +70,7 @@ public class Scanner {
                 // Ignore whitespace.
                 break;
             case '\n':
-                currentLine++;
+                addLine();
                 break;
             case '(':
                 addToken(TokenType.LEFT_PARENTHESES);
@@ -129,10 +132,15 @@ public class Scanner {
                     scanIdentifier();
                 }
                 else {
-                    throw new LexicalException(currentLine, 0, String.format("Unexpected Token: '%c'", c));
+                    reportError(String.format("Unexpected token: %c", c));
+                    // throw new LexicalException(currentLine, current - lineStart, String.format("Unexpected Token: '%c'", c));
                 }
             }
         }
+    }
+
+    private void reportError(String text) {
+        SInterpreter.error(currentLine, current - lineStart, source, text);
     }
 
     private void scanIdentifier() {
@@ -156,16 +164,20 @@ public class Scanner {
                 addToken(TokenType.DIGIT, Integer.parseInt(source.substring(start, current)));
             }
         } catch (NumberFormatException e){
-	        throw new LexicalException(currentLine, 0, "Number is invalid");
+            reportError("Number format is invalid");
+	        // throw new LexicalException(currentLine, current - lineStart, "Number is invalid");
         }
     }
 
     private void scanString() throws LexicalException {
         while (!isEOF() && source.charAt(current) != '\"') {
-            if(source.charAt(current) == '\n') currentLine++;
+            if(source.charAt(current) == '\n') addLine();
             advance();
         }
-        if(isEOF()) throw new LexicalException(currentLine, 0, "Unterminated string");
+        if(isEOF()){
+            reportError("Unterminated string");
+            //throw new LexicalException(currentLine, current - lineStart, "Unterminated string");
+        }
         advance();
         String value = source.substring(start + 1, current - 1);
         addToken(TokenType.STRING, value);
@@ -220,7 +232,7 @@ public class Scanner {
 
     private void addToken(TokenType type, Object val) {
         String text = source.substring(start, current);
-        tokenList.add(new Token(text, type, val, currentLine));
+        tokenList.add(new Token(text, type, val, currentLine, current - lineStart));
     }
 
     private boolean isEOF(){
@@ -229,6 +241,11 @@ public class Scanner {
 
     private boolean isDigit(char c) {
         return c >= '0' && c <= '9';
+    }
+
+    private void addLine(){
+        ++currentLine;
+        lineStart = current;
     }
 
     private boolean isAlpha(char c) {

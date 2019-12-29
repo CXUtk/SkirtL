@@ -24,9 +24,21 @@ public abstract class Expr {
             return visitor.visitBinaryExpr(this);
         }
 
-        final Expr left;
-        final Token operator;
-        final Expr right;
+        private final Expr left;
+        private final Token operator;
+        private final Expr right;
+
+        public Token getOperator() {
+            return operator;
+        }
+
+        public Expr getRight() {
+            return right;
+        }
+
+        public Expr getLeft() {
+            return left;
+        }
     }
 
     public static class Grouping extends Expr {
@@ -38,7 +50,11 @@ public abstract class Expr {
             return visitor.visitGroupingExpr(this);
         }
 
-        final Expr expression;
+        private final Expr expression;
+
+        public Expr getExpression() {
+            return expression;
+        }
     }
 
     public static class Literal extends Expr {
@@ -50,7 +66,11 @@ public abstract class Expr {
             return visitor.visitLiteralExpr(this);
         }
 
-        final Object value;
+        private final Object value;
+
+        public Object getValue() {
+            return value;
+        }
     }
 
     public static class Unary extends Expr {
@@ -63,8 +83,16 @@ public abstract class Expr {
             return visitor.visitUnaryExpr(this);
         }
 
-        final Token operator;
-        final Expr right;
+        private final Token operator;
+        private final Expr right;
+
+        public Expr getRight() {
+            return right;
+        }
+
+        public Token getOperator() {
+            return operator;
+        }
     }
 
     public abstract <R> R accept(Visitor<R> visitor);

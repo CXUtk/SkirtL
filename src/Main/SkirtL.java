@@ -1,4 +1,4 @@
-import Utils.FileUtils;
+package Main;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -6,13 +6,12 @@ import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 
 public class SkirtL {
 
     public static void main(String[] args) throws IOException {
         if (args.length > 1) {
-            System.err.println("Usage: SkirtL [filename]");
+            System.err.println("Usage: Main.SkirtL [filename]");
             System.exit(-1);
         } else if (args.length == 1) {
             runScript(args[0]);
@@ -20,6 +19,8 @@ public class SkirtL {
             runShell();
         }
     }
+
+
 
     /**
      * Start the command prompt and reading user input
