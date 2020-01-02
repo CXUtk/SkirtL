@@ -2,10 +2,13 @@ package Main;
 
 import ErrorHandling.LexicalException;
 import ErrorHandling.ParsingException;
+import ErrorHandling.RuntimeError;
+import Evaluator.Evaluator;
 import Lexical.Scanner;
 import Lexical.Token;
 import Lexical.TokenList;
 import Parsing.AST.ASTPrinter;
+import Parsing.AST.Expr;
 import Parsing.Parser;
 
 import java.util.ArrayList;
@@ -34,6 +37,7 @@ public class SInterpreter {
 
     public void run(String str, String filename){
     	try {
+    		// Tokenize
 		    Scanner scanner = new Scanner(str);
 		    ArrayList<Token> tokens = scanner.scanTokens();
 		    if(hadError) return;
@@ -41,13 +45,22 @@ public class SInterpreter {
 		    	System.out.print(tk.toString() + ", ");
 		    }
 		    System.out.println();
+
+		    // Parsing
 		    Parser parser = new Parser(tokens);
 		    ASTPrinter printer  = new ASTPrinter();
-		    System.out.println(printer.getString(parser.getExpression()));
+		    Expr expr = parser.getExpression();
+		    System.out.println(printer.getString(expr));
+
+		    // Evaluation
+		    Evaluator evaluator = new Evaluator();
+		    System.out.println(evaluator.evaluate(expr));
 	    } catch (LexicalException e) {
 		    System.err.println(String.format("[Lexical Error] %s (%s: line: %d)", e.getMessage(), filename, e.getLine()));
 	    } catch (ParsingException e) {
 		    // System.err.println(String.format("[Parsing Error] %s (%s: line: %d)", e.getMessage(), filename, e.getLine()));
+	    } catch (RuntimeError e){
+		    System.err.println(String.format("[Runtime Error] %s (%s: line: %d)", e.getMessage(), filename, e.getToken().getLineNumber()));
 	    }
     }
 }

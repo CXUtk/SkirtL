@@ -161,7 +161,7 @@ public class Scanner {
             if (fraction) {
                 addToken(TokenType.DIGIT, Double.parseDouble(source.substring(start, current)));
             } else {
-                addToken(TokenType.DIGIT, Integer.parseInt(source.substring(start, current)));
+                addToken(TokenType.DIGIT, Long.parseLong(source.substring(start, current)));
             }
         } catch (NumberFormatException e){
             reportError("Number format is invalid");

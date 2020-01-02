@@ -11,27 +11,27 @@ public class ASTPrinter implements Expr.Visitor<String> {
 
     @Override
     public String visitBinaryExpr(Expr.Binary expr) {
-        return parenthesize(expr.operator.getText(), expr.left, expr.right);
+        return parenthesize(expr.getOperator().getText(), expr.getLeft(), expr.getRight());
     }
 
     @Override
     public String visitGroupingExpr(Expr.Grouping expr) {
-        return expr.expression.accept(this);
+        return expr.getExpression().accept(this);
     }
 
     @Override
     public String visitLiteralExpr(Expr.Literal expr) {
         // If value is null means it is `null`
-        if(expr.value == null) return "null";
-        return expr.value.toString();
+        if(expr.getValue() == null) return "null";
+        return expr.getValue().toString();
     }
 
     @Override
     public String visitUnaryExpr(Expr.Unary expr) {
-        String str = expr.operator.getText();
-        if(expr.operator.getType() == TokenType.MINUS) str = "neg";
-        else if(expr.operator.getType() == TokenType.NOT) str = "not";
-        return parenthesize(str, expr.right);
+        String str = expr.getOperator().getText();
+        if(expr.getOperator().getType() == TokenType.MINUS) str = "neg";
+        else if(expr.getOperator().getType() == TokenType.NOT) str = "not";
+        return parenthesize(str, expr.getRight());
     }
 
     private String parenthesize(String name, Expr... exprs) {
