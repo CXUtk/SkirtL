@@ -50,6 +50,7 @@ public class SInterpreter {
 		    Parser parser = new Parser(tokens);
 		    ASTPrinter printer  = new ASTPrinter();
 		    Expr expr = parser.getExpression();
+            if(hadError) return;
 		    System.out.println(printer.getString(expr));
 
 		    // Evaluation

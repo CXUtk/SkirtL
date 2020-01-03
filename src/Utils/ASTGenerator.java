@@ -18,6 +18,10 @@ public class ASTGenerator {
                 "Literal  : Object value",
                 "Unary    : Token operator, Expr right"
         ));
+        defineAst(outputDir, "Stmt", Arrays.asList(
+                "Expression : Expr expression",
+                "Print      : Expr expression"
+        ));
     }
 
     private static void defineAst(String outputDir, String base, List<String> types) throws IOException {
@@ -86,7 +90,10 @@ public class ASTGenerator {
         // Fields.
         writer.println();
         for (String field : fields) {
-            writer.println("    final " + field + ";");
+            writer.println("    private final " + field + ";");
+        }
+        for (String field : fields) {
+            writer.println("    private final " + field + ";");
         }
 
         writer.println("  }");

@@ -20,10 +20,92 @@ public class Evaluator implements Expr.Visitor<Object> {
                 return divide(left, right, expr.getOperator());
             case STAR:
                 return multiply(left, right, expr.getOperator());
+            case PLUS:
+                return plus(left, right, expr.getOperator());
+            case POWER:
+                return power(left, right, expr.getOperator());
+            case GREATER_THAN:
+                return greater(left, right, expr.getOperator());
+            case GREATER_THAN_EQUAL_TO:
+                return greatereq(left, right, expr.getOperator());
+            case LESS_THAN:
+                return less(left, right, expr.getOperator());
+            case LESS_THAN_EQUAL_TO:
+                return lesseq(left, right, expr.getOperator());
+            case EQUAL_TO:
+                return equalTo(left, right);
+            case NOT_EQUAL_TO:
+                return !equalTo(left, right);
+            default:
+                break;
         }
-
         // Unreachable.
         return null;
+    }
+
+    private boolean equalTo(Object left, Object right) {
+        if(left == null && right == null)return true;
+        if(left == null)return false;
+        return left.equals(right);
+    }
+    private Object greater(Object left, Object right, Token token) {
+        if(left instanceof Long && right instanceof Long){
+            return (long)left > (long)right;
+        }
+        else if(left instanceof Double && right instanceof Double){
+            return (double)left > (double)right;
+        }
+        throw new RuntimeError("type between '>' operator does not match", token);
+    }
+
+    private Object greatereq(Object left, Object right, Token token) {
+        if(left instanceof Long && right instanceof Long){
+            return (long)left >= (long)right;
+        }
+        else if(left instanceof Double && right instanceof Double){
+            return (double)left >= (double)right;
+        }
+        throw new RuntimeError("type between '>=' operator does not match", token);
+    }
+
+    private Object less(Object left, Object right, Token token) {
+        if(left instanceof Long && right instanceof Long){
+            return (long)left < (long)right;
+        }
+        else if(left instanceof Double && right instanceof Double){
+            return (double)left < (double)right;
+        }
+        throw new RuntimeError("type between '<' operator does not match", token);
+    }
+
+    private Object lesseq(Object left, Object right, Token token) {
+        if(left instanceof Long && right instanceof Long){
+            return (long)left <= (long)right;
+        }
+        else if(left instanceof Double && right instanceof Double){
+            return (double)left <= (double)right;
+        }
+        throw new RuntimeError("type between '<=' operator does not match", token);
+    }
+
+    private long power(long val, long exp){
+        long ans = 1;
+        while(exp > 0){
+            if(exp % 2 == 1) ans *= val;
+            val *= val;
+            exp /= 2;
+        }
+        return ans;
+    }
+
+    private Object power(Object left, Object right, Token token) {
+        if(left instanceof Long && right instanceof Long){
+            return power((long)left, (long)right);
+        }
+        else if(left instanceof Double && right instanceof Double){
+            return Math.pow((double)left, (double)right);
+        }
+        throw new RuntimeError("type between '^' operator does not match", token);
     }
 
     private Object minus(Object left, Object right, Token token) {
@@ -90,6 +172,9 @@ public class Evaluator implements Expr.Visitor<Object> {
                 return negate(right, expr.getOperator());
             case NOT:
                 return !getTruth(right);
+            case PLUS:
+                // Useless plus sign
+                return right;
             default:
                 break;
         }
