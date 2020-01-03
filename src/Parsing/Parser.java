@@ -20,12 +20,13 @@ import java.util.ArrayList;
  * unary          → ( "!" | "-" )? power
  * power          → primary ( "^" unary)*
  * primary        → NUMBER | STRING | "false" | "true" | "nil"
- *                | "(" expression ")"
+ *                | "(" expression ")" | IDENTIFIER
  *
- * program        → statement* EOF ;
- * statement      → exprStmt | printStmt ;
- * exprStmt       → expression ";" ;
- * printStmt      → "print" expression ";" ;
+ * program        → statement* EOF
+ * statement      → exprStmt | printStmt
+ *  exprStmt       → expression ";"
+ *  printStmt      → "print" expression ";"
+ *  varStmt        → "var" IDENTIFIER "=" expression
  */
 public class Parser {
     private ArrayList<Token> tokenList;
@@ -34,10 +35,6 @@ public class Parser {
     public Parser(ArrayList<Token> tokens){
         this.tokenList = tokens;
         this.current = 0;
-    }
-
-    public Expr getExpression() throws ParsingException {
-        return expression();
     }
 
 

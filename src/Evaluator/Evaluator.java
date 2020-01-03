@@ -164,7 +164,7 @@ public class Evaluator implements Expr.Visitor<Object>, Stmt.Visitor<Object> {
 
     @Override
     public Object visitGroupingExpr(Expr.Grouping expr) {
-        return null;
+        return evaluate(expr.getExpression());
     }
 
     @Override
@@ -215,6 +215,11 @@ public class Evaluator implements Expr.Visitor<Object>, Stmt.Visitor<Object> {
     public Object visitPrintStmt(Stmt.Print stmt) {
         Object value = evaluate(stmt.getExpression());
         System.out.println(value.toString());
+        return null;
+    }
+
+    @Override
+    public Object visitVarStmt(Stmt.Var stmt) {
         return null;
     }
 }
