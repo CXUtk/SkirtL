@@ -3,12 +3,20 @@ package Evaluator;
 import ErrorHandling.RuntimeError;
 import Lexical.Token;
 import Parsing.AST.Expr;
+import Parsing.AST.Stmt;
 
-public class Evaluator implements Expr.Visitor<Object> {
-    public Object evaluate(Expr expr){
+import java.util.ArrayList;
+
+public class Evaluator implements Expr.Visitor<Object>, Stmt.Visitor<Object> {
+    private Object evaluate(Expr expr){
         return expr.accept(this);
     }
 
+    public void evaluate(ArrayList<Stmt> list){
+        for(Stmt stmt : list){
+            stmt.accept(this);
+        }
+    }
     @Override
     public Object visitBinaryExpr(Expr.Binary expr) {
         Object left = evaluate(expr.getLeft());
@@ -195,5 +203,18 @@ public class Evaluator implements Expr.Visitor<Object> {
         if(right == null) return false;
         if(right instanceof Boolean) return (boolean)right;
         return true;
+    }
+
+    @Override
+    public Object visitExpressionStmt(Stmt.Expression stmt) {
+        evaluate(stmt.getExpression());
+        return null;
+    }
+
+    @Override
+    public Object visitPrintStmt(Stmt.Print stmt) {
+        Object value = evaluate(stmt.getExpression());
+        System.out.println(value.toString());
+        return null;
     }
 }

@@ -9,6 +9,7 @@ import Lexical.Token;
 import Lexical.TokenList;
 import Parsing.AST.ASTPrinter;
 import Parsing.AST.Expr;
+import Parsing.AST.Stmt;
 import Parsing.Parser;
 
 import java.util.ArrayList;
@@ -48,14 +49,19 @@ public class SInterpreter {
 
 		    // Parsing
 		    Parser parser = new Parser(tokens);
-		    ASTPrinter printer  = new ASTPrinter();
-		    Expr expr = parser.getExpression();
-            if(hadError) return;
-		    System.out.println(printer.getString(expr));
 
-		    // Evaluation
-		    Evaluator evaluator = new Evaluator();
-		    System.out.println(evaluator.evaluate(expr));
+		    ArrayList<Stmt> stmtList = parser.parse();
+            ASTPrinter printer  = new ASTPrinter();
+            System.out.print("[ ");
+            for(Stmt stmt : stmtList){
+                System.out.print(stmt.accept(printer));
+                System.out.print(",");
+            }
+            System.out.println(" ]");
+            if(hadError) return;
+            execute(stmtList);
+
+
 	    } catch (LexicalException e) {
 		    System.err.println(String.format("[Lexical Error] %s (%s: line: %d)", e.getMessage(), filename, e.getLine()));
 	    } catch (ParsingException e) {
@@ -63,5 +69,11 @@ public class SInterpreter {
 	    } catch (RuntimeError e){
 		    System.err.println(String.format("[Runtime Error] %s (%s: line: %d)", e.getMessage(), filename, e.getToken().getLineNumber()));
 	    }
+    }
+
+    private void execute(ArrayList<Stmt> stmtList) {
+        Evaluator evaluator = new Evaluator();
+        evaluator.evaluate(stmtList);
+
     }
 }

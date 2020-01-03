@@ -6,20 +6,26 @@ import Lexical.TokenList;
 import Lexical.TokenType;
 import Main.SInterpreter;
 import Parsing.AST.Expr;
+import Parsing.AST.Stmt;
 
 import javax.swing.text.html.parser.AttributeList;
 import java.util.ArrayList;
 
 /**
- * expression     → equality ;
- * equality       → comparison ( ( "!=" | "==" ) comparison )* ;
- * comparison     → addition ( ( ">" | ">=" | "<" | "<=" ) addition )* ;
- * addition       → multiplication ( ( "-" | "+" ) multiplication )* ;
- * multiplication → unary ( ( "/" | "*" ) unary )* ;
+ * expression     → equality
+ * equality       → comparison ( ( "!=" | "==" ) comparison )*
+ * comparison     → addition ( ( ">" | ">=" | "<" | "<=" ) addition )*
+ * addition       → multiplication ( ( "-" | "+" ) multiplication )*
+ * multiplication → unary ( ( "/" | "*" ) unary )*
  * unary          → ( "!" | "-" )? power
- * power          -> primary ( "^" unary)*
+ * power          → primary ( "^" unary)*
  * primary        → NUMBER | STRING | "false" | "true" | "nil"
- *                | "(" expression ")" ;
+ *                | "(" expression ")"
+ *
+ * program        → statement* EOF ;
+ * statement      → exprStmt | printStmt ;
+ * exprStmt       → expression ";" ;
+ * printStmt      → "print" expression ";" ;
  */
 public class Parser {
     private ArrayList<Token> tokenList;
@@ -32,6 +38,32 @@ public class Parser {
 
     public Expr getExpression() throws ParsingException {
         return expression();
+    }
+
+
+    public ArrayList<Stmt> parse() {
+        ArrayList<Stmt> stmtList = new ArrayList<>();
+        while(!isAtEnd()){
+            stmtList.add(statement());
+        }
+        return stmtList;
+    }
+
+    private Stmt statement() {
+        if(match(TokenType.PRINT)) return printStatement();
+        return expressionStatement();
+    }
+
+    private Stmt expressionStatement() {
+        Expr expr = expression();
+        expect(TokenType.SEMICOLON, "Expect ';' at the end of statement");
+        return new Stmt.Expression(expr);
+    }
+
+    private Stmt printStatement() {
+        Expr expr = expression();
+        expect(TokenType.SEMICOLON, "Expect ';' at the end of statement");
+        return new Stmt.Print(expr);
     }
 
     /**
@@ -148,6 +180,11 @@ public class Parser {
         return new ParsingException(text);
     }
 
+    /**
+     * Match current token with these types, if matched return true and advance
+     * @param types
+     * @return
+     */
     private boolean match(TokenType... types) {
         for (TokenType type : types) {
             if (check(type)) {

@@ -18,6 +18,10 @@ public abstract class Stmt {
         }
 
         private final Expr expression;
+
+        public Expr getExpression() {
+            return expression;
+        }
     }
 
     public static class Print extends Stmt {
@@ -30,6 +34,10 @@ public abstract class Stmt {
         }
 
         private final Expr expression;
+
+        public Expr getExpression() {
+            return expression;
+        }
     }
 
     public abstract <R> R accept(Visitor<R> visitor);

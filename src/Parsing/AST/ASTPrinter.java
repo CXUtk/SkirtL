@@ -3,7 +3,7 @@ package Parsing.AST;
 import Lexical.Token;
 import Lexical.TokenType;
 
-public class ASTPrinter implements Expr.Visitor<String> {
+public class ASTPrinter implements Expr.Visitor<String>, Stmt.Visitor<String> {
 
     public String getString(Expr expr) {
         return expr.accept(this);
@@ -23,6 +23,7 @@ public class ASTPrinter implements Expr.Visitor<String> {
     public String visitLiteralExpr(Expr.Literal expr) {
         // If value is null means it is `null`
         if(expr.getValue() == null) return "null";
+        if(expr.getValue() instanceof String) return String.format("\"%s\"", expr.getValue());
         return expr.getValue().toString();
     }
 
@@ -57,5 +58,15 @@ public class ASTPrinter implements Expr.Visitor<String> {
                         new Expr.Literal(45.67)));
 
         System.out.println(new ASTPrinter().getString(expression));
+    }
+
+    @Override
+    public String visitExpressionStmt(Stmt.Expression stmt) {
+        return stmt.getExpression().accept(this);
+    }
+
+    @Override
+    public String visitPrintStmt(Stmt.Print stmt) {
+        return parenthesize("print", stmt.getExpression());
     }
 }
