@@ -24,12 +24,13 @@ import java.util.ArrayList;
  * assignment     → IDENTIFIER "=" assignment
  *            | equality ;
  *
- * program        → statement* EOF
+ * program        → declaration* EOF
  * declaration    → varDecl | statement
  * varDecl        → "var" IDENTIFIER "=" expression
- * statement      → exprStmt | printStmt
+ * statement      → exprStmt | printStmt | block
  *  exprStmt       → expression ";"
  *  printStmt      → "print" expression ";"
+ *  block          → "{" declaration* "}"
  *
  */
 public class Parser {
@@ -68,7 +69,17 @@ public class Parser {
 
     private Stmt statement() {
         if(match(TokenType.PRINT)) return printStatement();
+        else if(match(TokenType.LEFT_BRACE)) return new Stmt.Block(block());
         return expressionStatement();
+    }
+
+    private ArrayList<Stmt> block() {
+        ArrayList<Stmt> statements = new ArrayList<>();
+        while(!check(TokenType.RIGHT_BRACE) && !isAtEnd()){
+            statements.add(declaration());
+        }
+        expect(TokenType.RIGHT_BRACE, "Expect '{' at the end of the block");
+        return statements;
     }
 
     private Stmt expressionStatement() {

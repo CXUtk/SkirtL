@@ -30,13 +30,15 @@ public class SkirtL {
         InputStreamReader input = new InputStreamReader(System.in);
         BufferedReader reader = new BufferedReader(input);
         StringBuilder sb = new StringBuilder();
+        SInterpreter interpreter = new SInterpreter();
         while (true){
             System.out.print("> ");
             String str = reader.readLine();
             sb.append(str);
             sb.append('\n');
             if(str.length() == 0 || str.charAt(str.length() - 1) != ';')continue;
-            run(sb.toString(), "[Prompt]");
+            interpreter.run(sb.toString(), "[Prompt]");
+            // run(sb.toString(), "[Prompt]");
             sb = new StringBuilder();
         }
     }

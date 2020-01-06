@@ -5,6 +5,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
 
+
 public class ASTGenerator {
     public static void main(String[] args) throws IOException {
         if (args.length != 1) {
@@ -21,6 +22,7 @@ public class ASTGenerator {
                 "Assign   : Token name, Expr value"
         ));
         defineAst(outputDir, "Stmt", Arrays.asList(
+                "Block      : ArrayList<Stmt> statements",
                 "Expression : Expr expression",
                 "Print      : Expr expression",
                 "Var        : Token name, Expr initializer"

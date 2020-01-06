@@ -3,6 +3,8 @@ package Parsing.AST;
 import Lexical.Token;
 import Lexical.TokenType;
 
+import java.util.ArrayList;
+
 public class ASTPrinter implements Expr.Visitor<String>, Stmt.Visitor<String> {
 
     public String getString(Expr expr) {
@@ -58,6 +60,17 @@ public class ASTPrinter implements Expr.Visitor<String>, Stmt.Visitor<String> {
         return builder.toString();
     }
 
+    private String blockize(Stmt.Block block) {
+        StringBuilder builder = new StringBuilder();
+        builder.append("{");
+        for (Stmt stmt: block.getStatements()) {
+            builder.append(stmt.accept(this));
+            builder.append(",");
+        }
+        builder.append("}");
+        return builder.toString();
+    }
+
     public static void main(String[] args) {
         Expr expression = new Expr.Binary(
                 new Expr.Unary(
@@ -83,5 +96,10 @@ public class ASTPrinter implements Expr.Visitor<String>, Stmt.Visitor<String> {
     @Override
     public String visitVarStmt(Stmt.Var stmt) {
         return parenthesize(String.format("var [%s]", stmt.getName().getText()), stmt.getInitializer());
+    }
+
+    @Override
+    public String visitBlockStmt(Stmt.Block stmt) {
+        return blockize(stmt);
     }
 }

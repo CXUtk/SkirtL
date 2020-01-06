@@ -17,8 +17,10 @@ import java.util.ArrayList;
 public class SInterpreter {
 
 	private static boolean hadError;
+	private Evaluator evaluator;
 
 	public SInterpreter(){
+		evaluator = new Evaluator();
 		hadError = false;
     }
 
@@ -59,7 +61,7 @@ public class SInterpreter {
             }
             System.out.println(" ]");
             if(hadError) return;
-            execute(stmtList);
+		    evaluator.evaluate(stmtList);
 
 
 	    } catch (LexicalException e) {
@@ -71,9 +73,4 @@ public class SInterpreter {
 	    }
     }
 
-    private void execute(ArrayList<Stmt> stmtList) {
-        Evaluator evaluator = new Evaluator();
-        evaluator.evaluate(stmtList);
-
-    }
 }

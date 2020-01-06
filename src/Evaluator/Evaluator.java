@@ -246,4 +246,23 @@ public class Evaluator implements Expr.Visitor<Object>, Stmt.Visitor<Object> {
         environment.define(stmt.getName().getText(), evaluate(stmt.getInitializer()));
         return null;
     }
+
+    @Override
+    public Object visitBlockStmt(Stmt.Block stmt) {
+        return execBlock(stmt, new Environment(this.environment));
+    }
+
+    private Object execBlock(Stmt.Block stmt, Environment current){
+        Environment prev = this.environment;
+        try{
+            this.environment = current;
+            for(Stmt stmt1 : stmt.getStatements()){
+                stmt1.accept(this);
+            }
+        }
+        finally {
+            this.environment = prev;
+        }
+        return null;
+    }
 }

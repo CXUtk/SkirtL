@@ -2,11 +2,14 @@ package Parsing.AST;
 
 import Lexical.Token;
 
+import java.util.ArrayList;
+
 public abstract class Stmt {
     public interface Visitor<R> {
         R visitExpressionStmt(Expression stmt);
         R visitPrintStmt(Print stmt);
         R visitVarStmt(Var stmt);
+        R visitBlockStmt(Block stmt);
     }
 
     public static class Expression extends Stmt {
@@ -60,6 +63,22 @@ public abstract class Stmt {
 
         public Expr getInitializer() {
             return initializer;
+        }
+    }
+
+    public static class Block extends Stmt {
+        public Block(ArrayList<Stmt> statements) {
+            this.statements = statements;
+        }
+
+        public <R> R accept(Visitor<R> visitor) {
+            return visitor.visitBlockStmt(this);
+        }
+
+        private final ArrayList<Stmt> statements;
+
+        public ArrayList<Stmt> getStatements() {
+            return statements;
         }
     }
 
