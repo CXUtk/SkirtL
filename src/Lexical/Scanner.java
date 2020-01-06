@@ -140,7 +140,7 @@ public class Scanner {
     }
 
     private void reportError(String text) {
-        SInterpreter.error(currentLine, current - lineStart, source, text);
+        SInterpreter.error(currentLine, current - lineStart, source.substring(lineStart, current), text);
     }
 
     private void scanIdentifier() {

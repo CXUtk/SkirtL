@@ -35,6 +35,16 @@ public class ASTPrinter implements Expr.Visitor<String>, Stmt.Visitor<String> {
         return parenthesize(str, expr.getRight());
     }
 
+    @Override
+    public String visitVariableExpr(Expr.Variable expr) {
+        return expr.getName().getText();
+    }
+
+    @Override
+    public String visitAssignExpr(Expr.Assign expr) {
+        return parenthesize(String.format("assign [%s]", expr.getName().getText()), expr.getValue());
+    }
+
     private String parenthesize(String name, Expr... exprs) {
         StringBuilder builder = new StringBuilder();
 
@@ -72,6 +82,6 @@ public class ASTPrinter implements Expr.Visitor<String>, Stmt.Visitor<String> {
 
     @Override
     public String visitVarStmt(Stmt.Var stmt) {
-        return "var";
+        return parenthesize(String.format("var [%s]", stmt.getName().getText()), stmt.getInitializer());
     }
 }

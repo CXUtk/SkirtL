@@ -29,10 +29,15 @@ public class SkirtL {
     private static void runShell() throws IOException {
         InputStreamReader input = new InputStreamReader(System.in);
         BufferedReader reader = new BufferedReader(input);
-
+        StringBuilder sb = new StringBuilder();
         while (true){
             System.out.print("> ");
-            run(reader.readLine(), "[Prompt]");
+            String str = reader.readLine();
+            sb.append(str);
+            sb.append('\n');
+            if(str.length() == 0 || str.charAt(str.length() - 1) != ';')continue;
+            run(sb.toString(), "[Prompt]");
+            sb = new StringBuilder();
         }
     }
 

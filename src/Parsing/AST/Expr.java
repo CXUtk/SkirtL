@@ -11,6 +11,10 @@ public abstract class Expr {
         R visitLiteralExpr(Literal expr);
 
         R visitUnaryExpr(Unary expr);
+
+        R visitVariableExpr(Variable expr);
+
+        R visitAssignExpr(Assign expr);
     }
 
     public static class Binary extends Expr {
@@ -92,6 +96,45 @@ public abstract class Expr {
 
         public Token getOperator() {
             return operator;
+        }
+    }
+
+    public static class Variable extends Expr {
+        public Variable(Token name) {
+            this.name = name;
+        }
+
+        public <R> R accept(Visitor<R> visitor) {
+            return visitor.visitVariableExpr(this);
+        }
+
+        private final Token name;
+
+        public Token getName() {
+            return name;
+        }
+    }
+
+    public static class Assign extends Expr {
+        public Assign(Token name, Expr value) {
+            this.name = name;
+            this.value = value;
+        }
+
+        public <R> R accept(Visitor<R> visitor) {
+            return visitor.visitAssignExpr(this);
+        }
+
+        private final Token name;
+
+        public Token getName() {
+            return name;
+        }
+
+        private final Expr value;
+
+        public Expr getValue() {
+            return value;
         }
     }
 

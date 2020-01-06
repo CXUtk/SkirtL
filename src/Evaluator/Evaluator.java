@@ -8,6 +8,10 @@ import Parsing.AST.Stmt;
 import java.util.ArrayList;
 
 public class Evaluator implements Expr.Visitor<Object>, Stmt.Visitor<Object> {
+    private Environment environment;
+    public Evaluator(){
+        environment = new Environment();
+    }
     private Object evaluate(Expr expr){
         return expr.accept(this);
     }
@@ -136,6 +140,9 @@ public class Evaluator implements Expr.Visitor<Object>, Stmt.Visitor<Object> {
         else if(left instanceof String && right instanceof String){
             return left + (String)right;
         }
+        else if(left instanceof String && right instanceof Long){
+            return left + right.toString();
+        }
         throw new RuntimeError("type between '+' operator does not match", token);
     }
 
@@ -145,6 +152,11 @@ public class Evaluator implements Expr.Visitor<Object>, Stmt.Visitor<Object> {
         }
         else if(left instanceof Double && right instanceof Double){
             return (double)left * (double)right;
+        }
+        else if(left instanceof String && right instanceof Long){
+            StringBuilder sb = new StringBuilder();
+            for(int i = 0; i < (long)right; i++)sb.append((String)left);
+            return sb.toString();
         }
         throw new RuntimeError("type between '*' operator does not match", token);
     }
@@ -189,6 +201,17 @@ public class Evaluator implements Expr.Visitor<Object>, Stmt.Visitor<Object> {
         return null;
     }
 
+    @Override
+    public Object visitVariableExpr(Expr.Variable expr) {
+        return environment.get(expr.getName());
+    }
+
+    @Override
+    public Object visitAssignExpr(Expr.Assign expr) {
+        environment.assign(expr.getName(), evaluate(expr.getValue()));
+        return null;
+    }
+
     private Object negate(Object right, Token token) {
         if (right instanceof Long)
             return -(long) right;
@@ -220,6 +243,7 @@ public class Evaluator implements Expr.Visitor<Object>, Stmt.Visitor<Object> {
 
     @Override
     public Object visitVarStmt(Stmt.Var stmt) {
+        environment.define(stmt.getName().getText(), evaluate(stmt.getInitializer()));
         return null;
     }
 }

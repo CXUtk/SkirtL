@@ -12,7 +12,7 @@ import javax.swing.text.html.parser.AttributeList;
 import java.util.ArrayList;
 
 /**
- * expression     → equality
+ * expression     → assignment
  * equality       → comparison ( ( "!=" | "==" ) comparison )*
  * comparison     → addition ( ( ">" | ">=" | "<" | "<=" ) addition )*
  * addition       → multiplication ( ( "-" | "+" ) multiplication )*
@@ -21,12 +21,16 @@ import java.util.ArrayList;
  * power          → primary ( "^" unary)*
  * primary        → NUMBER | STRING | "false" | "true" | "nil"
  *                | "(" expression ")" | IDENTIFIER
+ * assignment     → IDENTIFIER "=" assignment
+ *            | equality ;
  *
  * program        → statement* EOF
+ * declaration    → varDecl | statement
+ * varDecl        → "var" IDENTIFIER "=" expression
  * statement      → exprStmt | printStmt
  *  exprStmt       → expression ";"
  *  printStmt      → "print" expression ";"
- *  varStmt        → "var" IDENTIFIER "=" expression
+ *
  */
 public class Parser {
     private ArrayList<Token> tokenList;
@@ -41,9 +45,25 @@ public class Parser {
     public ArrayList<Stmt> parse() {
         ArrayList<Stmt> stmtList = new ArrayList<>();
         while(!isAtEnd()){
-            stmtList.add(statement());
+            stmtList.add(declaration());
         }
         return stmtList;
+    }
+
+    private Stmt declaration() {
+        if (match(TokenType.VAR)) return varDeclaration();
+        return statement();
+    }
+
+    private void synchronize() {
+    }
+
+    private Stmt varDeclaration() {
+        Token name = expect(TokenType.IDENTIFIER, "Expect variable name");
+        expect(TokenType.ASSIGNMENT, "Expect '=' for variable initialization");
+        Expr expr = expression();
+        expect(TokenType.SEMICOLON, "Expect ';' at the end of statement");
+        return new Stmt.Var(name, expr);
     }
 
     private Stmt statement() {
@@ -68,7 +88,21 @@ public class Parser {
      * @return
      */
     private Expr expression() throws ParsingException {
-        return equality();
+        return assignment();
+    }
+
+    private Expr assignment(){
+        Expr expr = equality();
+        if(match(TokenType.ASSIGNMENT)){
+            Token op = getPrev();
+            Expr assign = assignment();
+            if(expr instanceof Expr.Variable){
+                Token name = ((Expr.Variable)expr).getName();
+                return new Expr.Assign(name, assign);
+            }
+            throw error(op, "Expect left value for assignment target");
+        }
+        return expr;
     }
 
     /**
@@ -161,14 +195,17 @@ public class Parser {
             expect(TokenType.RIGHT_PARENTHESES, "expect ')' for expression");
             return new Expr.Grouping(expr);
         }
+        else if(match(TokenType.IDENTIFIER)){
+            return new Expr.Variable(getPrev());
+        }
         throw error(getCurrent(), "Invalid expression");
     }
 
-    private void expect(TokenType type, String text) throws ParsingException {
+    private Token expect(TokenType type, String text) throws ParsingException {
         if(getCurrent().getType() != type){
             throw error(getCurrent(), text);
         }
-        advance();
+        return advance();
     }
 
 
