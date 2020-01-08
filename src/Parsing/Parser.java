@@ -8,7 +8,6 @@ import Main.SInterpreter;
 import Parsing.AST.Expr;
 import Parsing.AST.Stmt;
 
-import javax.swing.text.html.parser.AttributeList;
 import java.util.ArrayList;
 
 /**
@@ -22,15 +21,18 @@ import java.util.ArrayList;
  * primary        → NUMBER | STRING | "false" | "true" | "nil"
  *                | "(" expression ")" | IDENTIFIER
  * assignment     → IDENTIFIER "=" assignment
- *            | equality ;
+ *            | logic_or ;
+ * logic_or       → logic_and ("or" logic_and)*
+ * logic_and       → equality ("and" equality)*
  *
  * program        → declaration* EOF
  * declaration    → varDecl | statement
- * varDecl        → "var" IDENTIFIER "=" expression
- * statement      → exprStmt | printStmt | block
+ * varDecl        → "var" IDENTIFIER "=" expression ";"
+ * statement      → exprStmt | printStmt | block | ifStmt | whileStmt |forStmt |
  *  exprStmt       → expression ";"
  *  printStmt      → "print" expression ";"
  *  block          → "{" declaration* "}"
+ *  ifStmt         → "if" "(" expression ")" block ("else" block)?
  *
  */
 public class Parser {
@@ -56,9 +58,6 @@ public class Parser {
         return statement();
     }
 
-    private void synchronize() {
-    }
-
     private Stmt varDeclaration() {
         Token name = expect(TokenType.IDENTIFIER, "Expect variable name");
         expect(TokenType.ASSIGNMENT, "Expect '=' for variable initialization");
@@ -70,7 +69,22 @@ public class Parser {
     private Stmt statement() {
         if(match(TokenType.PRINT)) return printStatement();
         else if(match(TokenType.LEFT_BRACE)) return new Stmt.Block(block());
+        else if(match(TokenType.IF)) return ifStatement();
         return expressionStatement();
+    }
+
+    private Stmt ifStatement() {
+        expect(TokenType.LEFT_PARENTHESES, "Expect '(' on if statement condition");
+        Expr cond = expression();
+        expect(TokenType.RIGHT_PARENTHESES, "Expect ')' on if statement condition");
+        expect(TokenType.LEFT_BRACE, "Expect '{' on if statement");
+        Stmt.Block block = new Stmt.Block(block());
+        if(match(TokenType.ELSE)){
+            expect(TokenType.LEFT_BRACE, "Expect '{' on if statement");
+            Stmt.Block elseBlock = new Stmt.Block(block());
+            return new Stmt.If(cond, block, elseBlock);
+        }
+        return new Stmt.If(cond, block, null);
     }
 
     private ArrayList<Stmt> block() {
@@ -78,7 +92,7 @@ public class Parser {
         while(!check(TokenType.RIGHT_BRACE) && !isAtEnd()){
             statements.add(declaration());
         }
-        expect(TokenType.RIGHT_BRACE, "Expect '{' at the end of the block");
+        expect(TokenType.RIGHT_BRACE, "Expect '}' at the end of the block");
         return statements;
     }
 
@@ -103,7 +117,7 @@ public class Parser {
     }
 
     private Expr assignment(){
-        Expr expr = equality();
+        Expr expr = logic_or();
         if(match(TokenType.ASSIGNMENT)){
             Token op = getPrev();
             Expr assign = assignment();
@@ -112,6 +126,24 @@ public class Parser {
                 return new Expr.Assign(name, assign);
             }
             throw error(op, "Expect left value for assignment target");
+        }
+        return expr;
+    }
+
+    private Expr logic_or() {
+        Expr expr = logic_and();
+        while(match(TokenType.OR)){
+            Token op = getPrev();
+            expr = new Expr.Binary(expr, op, logic_and());
+        }
+        return expr;
+    }
+
+    private Expr logic_and() {
+        Expr expr = equality();
+        while(match(TokenType.AND)){
+            Token op = getPrev();
+            expr = new Expr.Binary(expr, op, equality());
         }
         return expr;
     }

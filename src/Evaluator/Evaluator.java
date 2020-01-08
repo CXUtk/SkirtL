@@ -48,11 +48,14 @@ public class Evaluator implements Expr.Visitor<Object>, Stmt.Visitor<Object> {
                 return equalTo(left, right);
             case NOT_EQUAL_TO:
                 return !equalTo(left, right);
+            case OR:
+                return getTruth(left) || getTruth(right);
+            case AND:
+                return getTruth(left) && getTruth(right);
             default:
-                break;
+                throw new RuntimeError("Undefined operation" + expr.getOperator().getType().toString(), expr.getOperator());
         }
         // Unreachable.
-        return null;
     }
 
     private boolean equalTo(Object left, Object right) {
@@ -250,6 +253,17 @@ public class Evaluator implements Expr.Visitor<Object>, Stmt.Visitor<Object> {
     @Override
     public Object visitBlockStmt(Stmt.Block stmt) {
         return execBlock(stmt, new Environment(this.environment));
+    }
+
+    @Override
+    public Object visitIfStmt(Stmt.If stmt) {
+        if(getTruth(stmt.getCondition())){
+            execBlock(stmt.getThenBlock(), new Environment(this.environment));
+        }
+        else if(stmt.getElseBlock() != null){
+            execBlock(stmt.getElseBlock(), new Environment(this.environment));
+        }
+        return null;
     }
 
     private Object execBlock(Stmt.Block stmt, Environment current){

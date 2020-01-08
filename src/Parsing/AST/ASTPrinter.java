@@ -102,4 +102,16 @@ public class ASTPrinter implements Expr.Visitor<String>, Stmt.Visitor<String> {
     public String visitBlockStmt(Stmt.Block stmt) {
         return blockize(stmt);
     }
+
+    @Override
+    public String visitIfStmt(Stmt.If stmt) {
+        StringBuilder builder = new StringBuilder();
+        builder.append("(If ");
+        builder.append(parenthesize("", stmt.getCondition()));
+        builder.append(blockize(stmt.getThenBlock()));
+        if (stmt.getElseBlock() != null)
+            builder.append(blockize(stmt.getElseBlock()));
+        builder.append(")");
+        return builder.toString();
+    }
 }

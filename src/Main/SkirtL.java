@@ -36,7 +36,7 @@ public class SkirtL {
             String str = reader.readLine();
             sb.append(str);
             sb.append('\n');
-            if(str.length() == 0 || str.charAt(str.length() - 1) != ';')continue;
+            if(str.length() == 0 || (str.charAt(str.length() - 1) != ';' && str.charAt(str.length() - 1) != '}'))continue;
             interpreter.run(sb.toString(), "[Prompt]");
             // run(sb.toString(), "[Prompt]");
             sb = new StringBuilder();
