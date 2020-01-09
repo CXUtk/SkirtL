@@ -2,6 +2,7 @@ package Evaluator;
 
 import ErrorHandling.RuntimeError;
 import Lexical.Token;
+import Lexical.TokenType;
 import Parsing.AST.Expr;
 import Parsing.AST.Stmt;
 
@@ -48,10 +49,6 @@ public class Evaluator implements Expr.Visitor<Object>, Stmt.Visitor<Object> {
                 return equalTo(left, right);
             case NOT_EQUAL_TO:
                 return !equalTo(left, right);
-            case OR:
-                return getTruth(left) || getTruth(right);
-            case AND:
-                return getTruth(left) && getTruth(right);
             default:
                 throw new RuntimeError("Undefined operation" + expr.getOperator().getType().toString(), expr.getOperator());
         }
@@ -213,6 +210,18 @@ public class Evaluator implements Expr.Visitor<Object>, Stmt.Visitor<Object> {
     public Object visitAssignExpr(Expr.Assign expr) {
         environment.assign(expr.getName(), evaluate(expr.getValue()));
         return null;
+    }
+
+    @Override
+    public Object visitLogicalExpr(Expr.Logical expr) {
+       Object obj = evaluate(expr.getLeft());
+       if(expr.getOperator().getType() == TokenType.OR){
+           if(getTruth(obj)) return obj;
+       }
+       else{
+           if(!getTruth(obj)) return obj;
+       }
+       return evaluate(expr.getRight());
     }
 
     private Object negate(Object right, Token token) {

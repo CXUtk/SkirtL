@@ -134,7 +134,7 @@ public class Parser {
         Expr expr = logic_and();
         while(match(TokenType.OR)){
             Token op = getPrev();
-            expr = new Expr.Binary(expr, op, logic_and());
+            expr = new Expr.Logical(expr, op, logic_and());
         }
         return expr;
     }
@@ -143,7 +143,7 @@ public class Parser {
         Expr expr = equality();
         while(match(TokenType.AND)){
             Token op = getPrev();
-            expr = new Expr.Binary(expr, op, equality());
+            expr = new Expr.Logical(expr, op, equality());
         }
         return expr;
     }

@@ -15,6 +15,8 @@ public abstract class Expr {
         R visitVariableExpr(Variable expr);
 
         R visitAssignExpr(Assign expr);
+
+        R visitLogicalExpr(Logical expr);
     }
 
     public static class Binary extends Expr {
@@ -135,6 +137,34 @@ public abstract class Expr {
 
         public Expr getValue() {
             return value;
+        }
+    }
+
+    public static class Logical extends Expr {
+        public Logical(Expr left, Token operator, Expr right) {
+            this.left = left;
+            this.operator = operator;
+            this.right = right;
+        }
+
+        public <R> R accept(Visitor<R> visitor) {
+            return visitor.visitLogicalExpr(this);
+        }
+
+        private final Expr left;
+        private final Token operator;
+        private final Expr right;
+
+        public Expr getLeft() {
+            return left;
+        }
+
+        public Expr getRight() {
+            return right;
+        }
+
+        public Token getOperator() {
+            return operator;
         }
     }
 

@@ -47,6 +47,11 @@ public class ASTPrinter implements Expr.Visitor<String>, Stmt.Visitor<String> {
         return parenthesize(String.format("assign [%s]", expr.getName().getText()), expr.getValue());
     }
 
+    @Override
+    public String visitLogicalExpr(Expr.Logical expr) {
+        return parenthesize(expr.getOperator().getText(), expr.getLeft(), expr.getRight());
+    }
+
     private String parenthesize(String name, Expr... exprs) {
         StringBuilder builder = new StringBuilder();
 
