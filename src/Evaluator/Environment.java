@@ -37,7 +37,10 @@ public class Environment {
             lookupTable.put(name.getText(), value);
             return;
         }
-        if(parent != null) assign(name, value);
+        if(parent != null) {
+            parent.assign(name, value);
+            return;
+        }
         throw new RuntimeError(String.format("Undefined variable %s", name.getText()), name);
     }
 }

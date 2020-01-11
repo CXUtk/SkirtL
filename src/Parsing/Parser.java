@@ -33,7 +33,8 @@ import java.util.ArrayList;
  *  printStmt      → "print" expression ";"
  *  block          → "{" declaration* "}"
  *  ifStmt         → "if" "(" expression ")" block ("else" block)?
- *
+ *  whileStmt      → "while" "(" expression ")" block
+ *  forStmt        → "for" "(" declaration?; expression?; declaration?")"  block
  */
 public class Parser {
     private ArrayList<Token> tokenList;
@@ -70,7 +71,42 @@ public class Parser {
         if(match(TokenType.PRINT)) return printStatement();
         else if(match(TokenType.LEFT_BRACE)) return new Stmt.Block(block());
         else if(match(TokenType.IF)) return ifStatement();
+        else if(match(TokenType.WHILE)) return whileStatement();
+        else if(match(TokenType.FOR)) return forStmt();
         return expressionStatement();
+    }
+
+    /**
+     * forStmt        → "for" "(" declaration?; expression?; declaration?")"  block
+     * @return
+     */
+    private Stmt forStmt() {
+        expect(TokenType.LEFT_PARENTHESES, "Expect '(' on for statement condition");
+        Stmt init = null;
+        Expr cond = null, upd = null;
+        if (!match(TokenType.SEMICOLON))
+            init = declaration();
+        if (!check(TokenType.SEMICOLON))
+            cond = expression();
+        expect(TokenType.SEMICOLON, "Expect ';' on for statement");
+        if (!check(TokenType.RIGHT_PARENTHESES))
+            upd = expression(); // no declaration
+        expect(TokenType.RIGHT_PARENTHESES, "Expect ')' on for statement");
+        expect(TokenType.LEFT_BRACE, "Expect '{' on for statement");
+        Stmt.Block block = new Stmt.Block(block());
+        return new Stmt.For(init, cond, upd, block);
+    }
+
+    /**
+    *  whileStmt      → "while" "(" expression ")" block
+    */
+    private Stmt whileStatement() {
+        expect(TokenType.LEFT_PARENTHESES, "Expect '(' on while statement condition");
+        Expr cond = expression();
+        expect(TokenType.RIGHT_PARENTHESES, "Expect ')' on while statement condition");
+        expect(TokenType.LEFT_BRACE, "Expect '{' on while statement");
+        Stmt.Block block = new Stmt.Block(block());
+        return new Stmt.While(cond, block);
     }
 
     private Stmt ifStatement() {

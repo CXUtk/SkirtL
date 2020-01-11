@@ -26,7 +26,9 @@ public class ASTGenerator {
                 "Block      : ArrayList<Stmt> statements",
                 "Expression : Expr expression",
                 "Print      : Expr expression",
-                "Var        : Token name, Expr initializer"
+                "Var        : Token name, Expr initializer",
+                "While      : Expr condition, Stmt body",
+                "For        : Stmt decl, Expression condition, Stmt upd"
         ));
     }
 

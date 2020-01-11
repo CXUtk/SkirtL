@@ -11,6 +11,8 @@ public abstract class Stmt {
         R visitVarStmt(Var stmt);
         R visitBlockStmt(Block stmt);
         R visitIfStmt(If stmt);
+        R visitWhileStmt(While stmt);
+        R visitForStmt(For stmt);
     }
 
     public static class Expression extends Stmt {
@@ -111,6 +113,61 @@ public abstract class Stmt {
         }
     }
 
+    public static class While extends Stmt {
+        public While(Expr condition, Block body) {
+            this.condition = condition;
+            this.body = body;
+        }
+
+        public <R> R accept(Visitor<R> visitor) {
+            return visitor.visitWhileStmt(this);
+        }
+
+        private final Expr condition;
+        private final Block body;
+
+        public Expr getCondition() {
+            return condition;
+        }
+
+        public Block getBody() {
+            return body;
+        }
+    }
+
+    public static class For extends Stmt {
+        public For(Stmt decl, Expr condition, Expr upd, Block block) {
+            this.decl = decl;
+            this.condition = condition;
+            this.upd = upd;
+            this.block = block;
+        }
+
+        public <R> R accept(Visitor<R> visitor) {
+            return visitor.visitForStmt(this);
+        }
+
+        private final Stmt decl;
+        private final Expr condition;
+        private final Expr upd;
+        private final Block block;
+
+        public Expr getCondition() {
+            return condition;
+        }
+
+        public Stmt getDecl() {
+            return decl;
+        }
+
+        public Expr getUpd() {
+            return upd;
+        }
+
+        public Block getBlock() {
+            return block;
+        }
+    }
 
     public abstract <R> R accept(Visitor<R> visitor);
 }

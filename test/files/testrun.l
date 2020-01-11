@@ -2,10 +2,11 @@
 var a = "ABC";
 var b = "DEF";
 print a * 3 + b * 2;
-var c = 5;
-if(c != 5){
-    print a + b;
+var c = 0;
+while(c < 3){
+    print "S";
+    c = c + 1;
 }
-else{
-    print 2 ^ 32 - 1;
+for(var i = 0; i < 5; i = i + 1){
+    print i;
 }

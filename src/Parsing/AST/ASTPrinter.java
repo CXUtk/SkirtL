@@ -112,11 +112,24 @@ public class ASTPrinter implements Expr.Visitor<String>, Stmt.Visitor<String> {
     public String visitIfStmt(Stmt.If stmt) {
         StringBuilder builder = new StringBuilder();
         builder.append("(If ");
-        builder.append(parenthesize("", stmt.getCondition()));
+        builder.append(parenthesize("test", stmt.getCondition()));
         builder.append(blockize(stmt.getThenBlock()));
         if (stmt.getElseBlock() != null)
             builder.append(blockize(stmt.getElseBlock()));
         builder.append(")");
         return builder.toString();
+    }
+
+    @Override
+    public String visitWhileStmt(Stmt.While stmt) {
+        return "(while " +
+                parenthesize("test", stmt.getCondition()) +
+                blockize(stmt.getBody()) +
+                ")";
+    }
+
+    @Override
+    public String visitForStmt(Stmt.For stmt) {
+        return "(for-loop)";
     }
 }

@@ -14,6 +14,7 @@ public class Evaluator implements Expr.Visitor<Object>, Stmt.Visitor<Object> {
         environment = new Environment();
     }
     private Object evaluate(Expr expr){
+        if(expr == null) return true;
         return expr.accept(this);
     }
 
@@ -266,11 +267,31 @@ public class Evaluator implements Expr.Visitor<Object>, Stmt.Visitor<Object> {
 
     @Override
     public Object visitIfStmt(Stmt.If stmt) {
-        if(getTruth(stmt.getCondition())){
+        if(getTruth(evaluate(stmt.getCondition()))){
             execBlock(stmt.getThenBlock(), new Environment(this.environment));
         }
         else if(stmt.getElseBlock() != null){
             execBlock(stmt.getElseBlock(), new Environment(this.environment));
+        }
+        return null;
+    }
+
+    @Override
+    public Object visitWhileStmt(Stmt.While stmt) {
+        while(getTruth(evaluate(stmt.getCondition()))){
+            execBlock(stmt.getBody(), new Environment(this.environment));
+        }
+        return null;
+    }
+
+    @Override
+    public Object visitForStmt(Stmt.For stmt) {
+        if(stmt.getDecl() != null)
+            stmt.getDecl().accept(this);
+        while(getTruth(evaluate(stmt.getCondition()))){
+            execBlock(stmt.getBlock(), new Environment(this.environment));
+            if(stmt.getUpd() != null)
+                evaluate(stmt.getUpd());
         }
         return null;
     }
