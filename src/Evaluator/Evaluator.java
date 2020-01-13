@@ -225,6 +225,11 @@ public class Evaluator implements Expr.Visitor<Object>, Stmt.Visitor<Object> {
        return evaluate(expr.getRight());
     }
 
+    @Override
+    public Object visitCallExpr(Expr.Call expr) {
+        return null;
+    }
+
     private Object negate(Object right, Token token) {
         if (right instanceof Long)
             return -(long) right;

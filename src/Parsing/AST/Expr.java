@@ -2,6 +2,8 @@ package Parsing.AST;
 
 import Lexical.Token;
 
+import java.util.ArrayList;
+
 public abstract class Expr {
     public interface Visitor<R> {
         R visitBinaryExpr(Binary expr);
@@ -17,6 +19,8 @@ public abstract class Expr {
         R visitAssignExpr(Assign expr);
 
         R visitLogicalExpr(Logical expr);
+
+        R visitCallExpr(Call expr);
     }
 
     public static class Binary extends Expr {
@@ -167,6 +171,35 @@ public abstract class Expr {
             return operator;
         }
     }
+
+    public static class Call extends Expr {
+        public Call(Expr callee, Token paren, ArrayList<Expr> arguments) {
+            this.callee = callee;
+            this.paren = paren;
+            this.arguments = arguments;
+        }
+
+        public <R> R accept(Visitor<R> visitor) {
+            return visitor.visitCallExpr(this);
+        }
+
+        private final Expr callee;
+        private final Token paren;
+        private final ArrayList<Expr> arguments;
+
+        public ArrayList<Expr> getArguments() {
+            return arguments;
+        }
+
+        public Expr getCallee() {
+            return callee;
+        }
+
+        public Token getParen() {
+            return paren;
+        }
+    }
+
 
     public abstract <R> R accept(Visitor<R> visitor);
 }

@@ -17,7 +17,10 @@ import java.util.ArrayList;
  * addition       → multiplication ( ( "-" | "+" ) multiplication )*
  * multiplication → unary ( ( "/" | "*" ) unary )*
  * unary          → ( "!" | "-" )? power
- * power          → primary ( "^" unary)*
+ *
+ * call           → primary ( "(" arguments? ")" )*
+ * arguments      → expression ( "," expression )*
+ *
  * primary        → NUMBER | STRING | "false" | "true" | "nil"
  *                | "(" expression ")" | IDENTIFIER
  * assignment     → IDENTIFIER "=" assignment
@@ -238,24 +241,44 @@ public class Parser {
     }
 
     /**
-     * [unary]          → ( "!" | "-" )? [power]
+     * [unary]          → ( "!" | "-" )? [unary] | [call]
      * @return
      */
     private Expr unary() throws ParsingException {
         if(match(TokenType.NOT, TokenType.MINUS, TokenType.PLUS)){
             Token op = getPrev();
-            return new Expr.Unary(op, power());
+            return new Expr.Unary(op, unary());
         }
-        return power();
+        return call();
     }
 
-    private Expr power() throws ParsingException{
+    /**
+     *  call           → primary ( "(" arguments? ")" )*
+     *  arguments      → expression ( "," expression )*
+     * @return
+     * @throws ParsingException
+     */
+    private Expr call() throws ParsingException{
         Expr expr = primary();
-        while(match(TokenType.POWER)){
-            Token op = getPrev();
-            expr = new Expr.Binary(expr, op, unary());
+        while(true){
+            if(match(TokenType.LEFT_PARENTHESES)){
+                expr = finishCall(expr);
+            }
+            else break;
         }
         return expr;
+    }
+
+    private Expr finishCall(Expr expr) {
+        ArrayList<Expr> arguments = new ArrayList<>();
+        if (!check(TokenType.RIGHT_PARENTHESES)) {
+            do{
+                // Match more arguments
+                arguments.add(expression());
+            } while(match(TokenType.COMMA));
+        }
+        Token token = expect(TokenType.RIGHT_PARENTHESES, "Expect ')' after function arguments");
+        return new Expr.Call(expr, token, arguments);
     }
 
     /**

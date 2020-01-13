@@ -32,7 +32,7 @@ public class SInterpreter {
 		System.err.println(
 				"[line " + line + "] Error" + ": " + message);
 		System.err.println(where);
-		for(int i = 0; i < col; i++)
+		for(int i = 0; i < col - 1; i++)
 			System.err.print(" ");
 		System.err.println("^");
 		hadError = true;
